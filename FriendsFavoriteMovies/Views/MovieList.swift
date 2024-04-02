@@ -10,53 +10,59 @@ import SwiftData
 
 struct MovieList: View {
     @Environment(\.modelContext) private var modelContext
-    @Query(sort: \Movie.title) private var movies: [Movie]
+    @Query private var movies: [Movie]
     
     @State private var newMovie: Movie?
-
-    var body: some View {
-        NavigationSplitView {
-            Group {
-                if !movies.isEmpty {
-                    List {
-                        ForEach(movies) { movie in
-                            NavigationLink {
-                                MovieDetail(movie: movie)
-                            } label: {
-                                Text(movie.title)
-                            }
-                        }
-                        .onDelete(perform: deleteItems)
-                    }
-                } else {
-                    ContentUnavailableView {
-                        Label("No Movies", systemImage: "film.stack")
-                    }
-                }
-            }
-            .navigationTitle("Movies")
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    EditButton()
-                }
-                ToolbarItem {
-                    Button(action: addMovie) {
-                        Label("Add Item", systemImage: "plus")
-                    }
-                }
-            }
-            .sheet(item: $newMovie) { movie in
-                NavigationStack {
-                    MovieDetail(movie: movie, isNew: true)
-                }
-                .interactiveDismissDisabled()
-            }
-        } detail: {
-            Text("Select a movie")
-                .navigationTitle("Movie")
+    
+    init(titleFilter: String = "") {
+        let predicate = #Predicate<Movie> { movie in
+            titleFilter.isEmpty || movie.title.localizedStandardContains(titleFilter)
         }
+        
+        _movies = Query(filter: predicate, sort: \Movie.title)
     }
-
+    
+    
+    var body: some View {
+        
+        Group {
+            if !movies.isEmpty {
+                List {
+                    ForEach(movies) { movie in
+                        NavigationLink {
+                            MovieDetail(movie: movie)
+                        } label: {
+                            Text(movie.title)
+                        }
+                    }
+                    .onDelete(perform: deleteItems)
+                }
+            } else {
+                ContentUnavailableView {
+                    Label("No Movies", systemImage: "film.stack")
+                }
+            }
+        }
+        .navigationTitle("Movies")
+        .toolbar {
+            ToolbarItem(placement: .navigationBarTrailing) {
+                EditButton()
+            }
+            ToolbarItem {
+                Button(action: addMovie) {
+                    Label("Add Item", systemImage: "plus")
+                }
+            }
+        }
+        .sheet(item: $newMovie) { movie in
+            NavigationStack {
+                MovieDetail(movie: movie, isNew: true)
+            }
+            .interactiveDismissDisabled()
+        }
+        
+    }
+    
     private func addMovie() {
         withAnimation {
             let newItem = Movie(title: "", releaseDate: Date())
@@ -64,7 +70,7 @@ struct MovieList: View {
             newMovie = newItem
         }
     }
-
+    
     private func deleteItems(offsets: IndexSet) {
         withAnimation {
             for index in offsets {
@@ -75,11 +81,24 @@ struct MovieList: View {
 }
 
 #Preview {
-    MovieList()
-        .modelContainer(SampleData.sharedData.modelContainer)
+    NavigationStack {
+        MovieList()
+            .modelContainer(SampleData.sharedData.modelContainer)
+    }
 }
 
+
 #Preview("Empty List") {
-    MovieList()
-        .modelContainer(for: Movie.self, inMemory: true)
+    NavigationStack {
+        MovieList()
+            .modelContainer(for: Movie.self, inMemory: true)
+    }
+}
+
+
+#Preview("Filtered") {
+    NavigationStack {
+        MovieList(titleFilter: "tr")
+            .modelContainer(SampleData.sharedData.modelContainer)
+    }
 }

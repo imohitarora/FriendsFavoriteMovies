@@ -15,6 +15,14 @@ struct FriendList: View {
     
     @State private var newFriend: Friend?
     
+    init(titleFilter: String = "") {
+        let predicate = #Predicate<Friend> { friend in
+            titleFilter.isEmpty || friend.name.localizedStandardContains(titleFilter)
+        }
+        
+        _friends = Query(filter: predicate, sort: \Friend.name)
+    }
+    
     var body: some View {
         NavigationSplitView {
             Group {
@@ -22,8 +30,7 @@ struct FriendList: View {
                     List {
                         ForEach(friends) { friend in
                             NavigationLink {
-                                Text(friend.name)
-                                    .navigationTitle("Friend")
+                                FriendDetail(friend: friend)
                             } label: {
                                 Text(friend.name)
                             }
@@ -46,7 +53,7 @@ struct FriendList: View {
             }
             .sheet(item: $newFriend) { friend in
                 NavigationStack {
-                    Text("New friend")
+                    FriendDetail(friend: friend, isNew: true)
                 }
                 .interactiveDismissDisabled()
             }

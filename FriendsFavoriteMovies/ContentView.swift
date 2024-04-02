@@ -9,10 +9,21 @@ import SwiftUI
 
 struct ContentView: View {
     var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+        TabView {
+            FilteredMovieList()
+                .tabItem {
+                    Label("Movie", systemImage: "film.stack")
+                }
+            
+            FriendList()
+                .tabItem {
+                    Label("Friends", systemImage: "person.and.person")
+                }
+        }
     }
 }
 
 #Preview {
     ContentView()
+        .modelContainer(SampleData.sharedData.modelContainer)
 }
