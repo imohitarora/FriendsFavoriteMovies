@@ -8,7 +8,7 @@
 import SwiftUI
 import SwiftData
 
-struct ContentView: View {
+struct MovieList: View {
     @Environment(\.modelContext) private var modelContext
     @Query(sort: \Movie.title) private var movies: [Movie]
     
@@ -75,11 +75,11 @@ struct ContentView: View {
 }
 
 #Preview {
-    ContentView()
+    MovieList()
         .modelContainer(SampleData.sharedData.modelContainer)
 }
 
 #Preview("Empty List") {
-    ContentView()
+    MovieList()
         .modelContainer(for: Movie.self, inMemory: true)
 }
