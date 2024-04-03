@@ -14,12 +14,17 @@ struct MovieList: View {
     
     @State private var newMovie: Movie?
     
-    init(titleFilter: String = "") {
+    @State private var titleSort = SortDescriptor(\Movie.title)
+    @State private var releaseDateSort = SortDescriptor(\Movie.releaseDate)
+    
+    init(titleFilter: String = "", sortByReleaseDate: Bool = false) {
         let predicate = #Predicate<Movie> { movie in
             titleFilter.isEmpty || movie.title.localizedStandardContains(titleFilter)
         }
         
-        _movies = Query(filter: predicate, sort: \Movie.title)
+        let sortOrder = sortByReleaseDate ? releaseDateSort : titleSort
+        
+        _movies = Query(filter: predicate, sort: [sortOrder])
     }
     
     
@@ -45,6 +50,7 @@ struct MovieList: View {
         }
         .navigationTitle("Movies")
         .toolbar {
+            
             ToolbarItem(placement: .navigationBarTrailing) {
                 EditButton()
             }
