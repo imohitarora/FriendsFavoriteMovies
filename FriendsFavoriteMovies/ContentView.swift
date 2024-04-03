@@ -15,7 +15,7 @@ struct ContentView: View {
                     Label("Movie", systemImage: "film.stack")
                 }
             
-            FriendList()
+            FilteredFriendList()
                 .tabItem {
                     Label("Friends", systemImage: "person.and.person")
                 }

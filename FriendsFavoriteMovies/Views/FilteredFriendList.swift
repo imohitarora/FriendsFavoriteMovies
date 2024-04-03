@@ -9,10 +9,16 @@ import SwiftUI
 
 struct FilteredFriendList: View {
     var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+        NavigationSplitView {
+            FriendList()
+        } detail: {
+            Text("Select a Friend")
+                .navigationTitle("Friend")
+        }
     }
 }
 
 #Preview {
     FilteredFriendList()
+        .modelContainer(SampleData.sharedData.modelContainer)
 }
